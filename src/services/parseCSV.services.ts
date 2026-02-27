@@ -4,13 +4,11 @@ import * as fs from "fs"
 
 export function parseCSV(file: string): {} {
     const base = process.cwd();
-    const filePath = path.join(base, "..", '../', "legacy",  'data', file)
+    const filePath = path.join(base, "..", '../', "legacy", 'data', file)
     const data = fs.readFileSync(filePath, 'utf-8').trim()
-    const data_title = file.split(".")[0]
-
 
     const lines = data.split(/\r?\n/).filter(l => l.trim());
-    const [headerLine, ...dataLines ]= lines;
+    const [headerLine, ...dataLines] = lines;
 
     const headers = headerLine.split(",")
 
@@ -24,4 +22,3 @@ export function parseCSV(file: string): {} {
     return result
 
 }
-

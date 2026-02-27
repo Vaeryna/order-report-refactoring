@@ -13,7 +13,6 @@ const MAX_DISCOUNT = 200;
 
 
 
-// Fonction principale qui fait TOUT
 function run(): string {
 
     const customers = parseCSV("customer.csv")
