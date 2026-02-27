@@ -6,16 +6,7 @@ import { Product } from './models/Product';
 import { Customer } from './models/Customer';
 import { ShippingZone } from './models/ShippingZone';
 import { Promotion } from './models/Promotion';
-
-// Constantes globales mal organisées  
-const TAX = 0.2;
-const SHIPPING_LIMIT = 50;
-const SHIP = 5.0;
-const PREMIUM_THRESHOLD = 1000;
-const LOYALTY_RATIO = 0.01;
-const HANDLING_FEE = 2.5;
-const MAX_DISCOUNT = 200;
-
+import { TAX, SHIPPING_LIMIT, SHIP, PREMIUM_THRESHOLD, LOYALTY_RATIO, HANDLING_FEE, MAX_DISCOUNT } from './global.constants'
 
 
 function run(): string {
@@ -25,8 +16,6 @@ function run(): string {
     const shippingZones: Record<string, ShippingZone> = parseCSV("shipping_zones.csv")
     const promotions: Record<string, Promotion> = parseCSV("promotions.csv")
     const orders: Record<string, Order> = parseCSV("orders.csv")
-
-
 
 
 
@@ -72,7 +61,7 @@ function run(): string {
         let lineTotal = o.qty * basePrice * (1 - discountRate) - fixedDiscount * o.qty;
 
         // Bonus matin (règle cachée basée sur l'heure)
-      
+
         const hour = parseInt(o.time?.split(':')[0] ?? "12:00");
         let morningBonus = 0;
         if (hour < 10) {
