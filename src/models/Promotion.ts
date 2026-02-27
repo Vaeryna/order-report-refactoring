@@ -1,6 +1,6 @@
 export interface Promotion{
     code: string,
     type: string,
-    value: number,
+    value: string,
     active: boolean
 }

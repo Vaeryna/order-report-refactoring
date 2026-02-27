@@ -1,6 +1,11 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { parseCSV } from './services/parseCSV.services';
+import { Order } from './models/Order';
+import { Product } from './models/Product';
+import { Customer } from './models/Customer';
+import { ShippingZone } from './models/ShippingZone';
+import { Promotion } from './models/Promotion';
 
 // Constantes globales mal organisées  
 const TAX = 0.2;
@@ -15,13 +20,11 @@ const MAX_DISCOUNT = 200;
 
 function run(): string {
 
-    const customers = parseCSV("customer.csv")
-    const products = parseCSV("products.csv")
-    const shippingZones = parseCSV("shipping_zones.csv")
-    const promotions = parseCSV("promotions.csv")
-    const orders = parseCSV("orders.csv")
-
-
+    const customers: Record<string, Customer> = parseCSV("customers.csv")
+    const products: Record<string, Product> = parseCSV("products.csv")
+    const shippingZones: Record<string, ShippingZone> = parseCSV("shipping_zones.csv")
+    const promotions: Record<string, Promotion> = parseCSV("promotions.csv")
+    const orders: Record<string, Order> = parseCSV("orders.csv")
 
 
 
@@ -30,7 +33,7 @@ function run(): string {
     // Calcul des points de fidélité (première duplication)
     const loyaltyPoints: Record<string, number> = {};
 
-    for (const o of orders) {
+    for (const o of Object.values(orders as Record<string, Order>)) {
         const cid = o.customer_id;
         if (!loyaltyPoints[cid]) {
             loyaltyPoints[cid] = 0;
@@ -41,7 +44,7 @@ function run(): string {
 
     // Groupement par client (logique métier mélangée avec aggregation)
     const totalsByCustomer: Record<string, any> = {};
-    for (const o of orders) {
+    for (const o of Object.values(orders as Record<string, Order>)) {
         const cid = o.customer_id;
 
         // Récupération du produit avec fallback
@@ -69,7 +72,8 @@ function run(): string {
         let lineTotal = o.qty * basePrice * (1 - discountRate) - fixedDiscount * o.qty;
 
         // Bonus matin (règle cachée basée sur l'heure)
-        const hour = parseInt(o.time.split(':')[0]);
+      
+        const hour = parseInt(o.time?.split(':')[0] ?? "12:00");
         let morningBonus = 0;
         if (hour < 10) {
             morningBonus = lineTotal * 0.03; // 3% de réduction supplémentaire
@@ -198,7 +202,7 @@ function run(): string {
             }
 
             // Majoration pour livraison en zone éloignée
-            if (zone === 'ZONE3' || zone === 'ZONE4') {
+            if (zone.toUpperCase() === 'ZONE3' || zone.toUpperCase() === 'ZONE4') {
                 ship = ship * 1.2;
             }
         } else {
@@ -268,6 +272,7 @@ function run(): string {
     console.log(result);
 
     // Export JSON surprise
+    const base = process.cwd();
     const outputPath = path.join(base, 'output.json');
     fs.writeFileSync(outputPath, JSON.stringify(jsonData, null, 2));
 
